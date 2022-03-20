@@ -52,7 +52,7 @@ Write-Log "Collecting data ..."
 $StopWatch = New-Object System.Diagnostics.Stopwatch
 $StopWatch.Start()
 
-$datasets = Invoke-dbaquery -sqlinstance $SqlCVServer -SqlCredential $SqlCVAdminCredential -query "$sql" | %{ `
+$datasets = Invoke-DbaQuery -sqlinstance $SqlCVServer -SqlCredential $SqlCVAdminCredential -query "$sql" | %{ `
   Write-Host $_.ServerName; `
   Invoke-DbaQuery -SQLInstance $_.IpAddress -SqlCredential $SqlCVCollectorCredential -file "$collectorSql" -As DataSet }
 

@@ -49,16 +49,28 @@ WHERE sc.[CollectionName]='$SqlCVCollection'
 $collectorSql = "$($SqlCVScriptPath)/$($SqlCVCollection).sql"
 
 Write-Log "Collecting data ..."
+$serverList = Invoke-DbaQuery -sqlinstance $SqlCVServer -SqlCredential $SqlCVAdminCredential -query "$sql"
+if ( $serverList -eq $Null ) {
+  Write-Log "No servers found for collector, maybe not defined in Collections?"
+  Stop-Log
+  Return
+}
+
 $StopWatch = New-Object System.Diagnostics.Stopwatch
 $StopWatch.Start()
 
-$datasets = Invoke-DbaQuery -sqlinstance $SqlCVServer -SqlCredential $SqlCVAdminCredential -query "$sql" | %{ `
+$datasets = $serverList  | %{ `
   Write-Host $_.ServerName; `
   Invoke-DbaQuery -SQLInstance $_.IpAddress -SqlCredential $SqlCVCollectorCredential -file "$collectorSql" -As DataSet }
 
 $StopWatch.Stop()
 Write-Log "Collection complete in $($StopWatch.Elapsed.TotalSeconds) second(s)"
 
+if ( $datasets -eq $Null ) {
+  Write-Log "No data returned from collector"
+  Stop-Log
+  Return
+}
 Write-Log "Loading data into $SqlCVDatabase ..."
 $StopWatch.Reset()
 $StopWatch.Start()

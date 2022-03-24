@@ -46,8 +46,12 @@ FROM [SQLClearview].[ref].[ServerCollections] sc
 JOIN [SQLClearview].[ref].[Servers] s ON (s.ServerName=sc.ServerName)
 WHERE sc.[CollectionName]='$SqlCVCollection'
 "@
-$collectorSql = "$($SqlCVScriptPath)/$($SqlCVCollection).sql"
 
+$collectorSql = "$($SqlCVScriptPath)\$($SqlCVCollection).sql"
+Write-Log "Looking for collector SQL in: $($collectorSql)"
+if ( !(Test-Path "$collectorSql") ) {
+  Throw "Collector SQL not found"
+}
 Write-Log "Collecting data ..."
 $serverList = Invoke-DbaQuery -sqlinstance $SqlCVServer -SqlCredential $SqlCVAdminCredential -query "$sql"
 if ( $serverList -eq $Null ) {
@@ -59,9 +63,10 @@ if ( $serverList -eq $Null ) {
 $StopWatch = New-Object System.Diagnostics.Stopwatch
 $StopWatch.Start()
 
-$datasets = $serverList  | %{ `
-  Write-Host $_.ServerName; `
-  Invoke-DbaQuery -SQLInstance $_.IpAddress -SqlCredential $SqlCVCollectorCredential -file "$collectorSql" -As DataSet }
+$datasets = $serverList  | %{
+  Write-Host $_.ServerName
+  Invoke-DbaQuery -SQLInstance $_.IpAddress -SqlCredential $SqlCVCollectorCredential -file "$collectorSql" -As DataSet
+}
 
 $StopWatch.Stop()
 Write-Log "Collection complete in $($StopWatch.Elapsed.TotalSeconds) second(s)"
@@ -74,8 +79,18 @@ if ( $datasets -eq $Null ) {
 Write-Log "Loading data into $SqlCVDatabase ..."
 $StopWatch.Reset()
 $StopWatch.Start()
+
 ForEach ( $ds in $datasets ) {
-	Write-DbaDbTableData -SqlInstance $SqlCVServer -SqlCredential $SqlCVAdminCredential -Database "$SqlCVDatabase" -Table "$SqlCVCollection" -InputObject $ds
+  #ForEach ( $t in $ds.Tables ) {
+  #  # $t.Columns[0]
+  #  $t.Columns['UtcTimestamp']
+  #}
+  Try {
+	   Write-DbaDbTableData -SqlInstance $SqlCVServer -SqlCredential $SqlCVAdminCredential -Database "$SqlCVDatabase" -Table "$SqlCVCollection" -InputObject $ds -EnableException
+  }
+  Catch {
+    Write-Log "Problem loading data!! $($_.Exception.Message)"
+  }
 }
 $StopWatch.Stop()
 Write-Log "Load complete in $($StopWatch.Elapsed.TotalSeconds) second(s)"

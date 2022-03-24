@@ -44,7 +44,7 @@ function Write-Log
 
 function Start-Log
 {
-  Write-Log "Begin $($scriptName) at: $(Get-Date)  Universal Time = $( ((Get-Date).ToUniversalTime()) )"
+  Write-Log "Begin $($scriptName) at: $(Get-Date)  UTC: $( ((Get-Date).ToUniversalTime()) )"
   Write-Log "----"
   Write-Log "Script directory: $($scriptDirectory)"
   Write-Log "Script parent   : $($scriptParent)"
@@ -54,7 +54,7 @@ function Start-Log
 function Stop-Log
 {
   Write-Log "----"
-  Write-Log "End $($scriptName) at: $(Get-Date)  Universal Time = $( ((Get-Date).ToUniversalTime()) )"
+  Write-Log "End $($scriptName) at: $(Get-Date)  UTC: $( ((Get-Date).ToUniversalTime()) )"
 }
 
 # Error handling

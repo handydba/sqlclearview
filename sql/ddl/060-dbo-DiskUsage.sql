@@ -24,31 +24,13 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-CREATE TABLE [SQLClearview].[dbo].[DatabaseDetails] (
+CREATE TABLE [SQLClearview].[dbo].[DiskUsage] (
 	[UtcTimestamp] datetime NOT NULL,
 	[ServerTimestamp] datetime NOT NULL,
 	[ServerName] nvarchar(128) NOT NULL,
-	[DatabaseId] int NOT NULL,
-	[DatabaseName] nvarchar(256) NOT NULL,
-	[OwnerLogin] nvarchar(128) NULL,
-	[Status] nvarchar(10) NULL,
-	[NumDatafiles] int NULL,
-	[DatafileMb] int NULL,
-	[NumLogfiles] int NULL,
-	[LogfileMb] int NULL,
-	[UserAccess] nvarchar(60) NULL,
-	[RecoveryModel] nvarchar(60) NULL,
-	[CompatibilityLevel] nvarchar(31) NULL,
-	[CreateDate] datetime NOT NULL,
-	[LastDatabaseBackup] datetime NULL,
-	[LastLogBackup] datetime NULL,
-	[PageVerifyOption] nvarchar(60) NULL,
-	[FlagFullTextEnabled] bit NULL,
-	[FlagAutoCloseOn] bit NOT NULL,
-	[FlagReadOnly] bit NULL,
-	[FlagAutoShrinkOn] bit NULL,
-	[FlagAutoCreateStatsOn] bit NULL,
-	[FlagAutoUpdateStatsOn] bit NULL,
-	[FlagInStandby] bit NULL,
-	[FlagCleanlyShutdown] bit NULL
+  [DiskLetter] varchar(1) NOT NULL,
+  [DiskLogicalName] varchar(512) NULL,
+  [Free%] decimal(5,2) NULL,
+  [FreeMb] float NULL,
+  [TotalMb] float NULL
 );

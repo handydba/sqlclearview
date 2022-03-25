@@ -63,6 +63,12 @@ GRANT VIEW SERVER STATE TO [SQLClearview-Collector]
 GO
 GRANT VIEW ANY DEFINITION TO [SQLClearview-Collector]
 GO
+/**
+ * Added in 2014, this is required for access to database specific objects,
+ * e.g. sys.database_files
+**/
+GRANT CONNECT ANY DATABASE TO [SQLClearview-Collector]
+GO
 
 USE [SQLClearview]
 GO
